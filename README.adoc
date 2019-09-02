@@ -1,0 +1,42 @@
+= Graal resource reader
+
+Project to test how read embedded resources in Graal native images.
+
+== Test bench
+
+The class link:src/main/java/org/abelsromero/nativ/App.java[] tries to read a resource from classpath using several methods and paths.
+
+== Testing
+
+Compile and run the program from the root directory.
+
+ $ mvn clean package \
+ && native-image -cp target/graal-resource-reader-1.0-SNAPSHOT.jar -H:Name=runner -H:IncludeResources='.*/*.properties$' -H:Log=registerResource --no-fallback org.abelsromero.nativ.App \
+ && ./runner
+
+This is the "current" behaviour:
+
+----
+== new File
+false
+false
+== App.class.getResource
+null
+java.io.ByteArrayInputStream@7f7382301d30
+== new App().getClass().getClassLoader().getResourceAsStream
+java.io.ByteArrayInputStream@7f73823020a0
+null
+== ClassLoader.class.getResourceAsStream
+null
+java.io.ByteArrayInputStream@7f7382302740
+== ClassLoader.getSystemResource
+resource:config.properties
+null
+== ClassLoader.getSystemClassLoader().getResourceAsStream
+java.io.ByteArrayInputStream@7f7382302e80
+null
+----
+
+== Known issues
+
+Using the exact name for the resources ('.*/config.properties$', with and without quotes) does not work with version 19.2.0.
